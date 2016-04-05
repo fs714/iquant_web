@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- 引入 ECharts 文件 -->
+    <script src="./lib/echarts.min.js"></script>
+    <script src="./lib/jquery-2.2.3.min.js"></script>
+</head>
+
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1200px;height:600px;"></div>
+    <script type="text/javascript">        
+        option = {
+          title: {
+              text: '上证指数',
+              left: 'center'
+          },
+          tooltip: {
+              trigger: 'axis',
+              axisPointer: {
+                  type: 'line'
+              }
+          },
+          grid: {
+              left: '10%',
+              right: '10%',
+              bottom: '15%'
+          },
+          xAxis: {
+              type: 'category',
+              data: [],
+              scale: true,
+              boundaryGap : false,
+              axisLine: {onZero: false},
+              splitLine: {show: false},
+              splitNumber: 20,
+              min: 'dataMin',
+              max: 'dataMax'
+          },          
+          yAxis: {
+              scale: true,
+              splitArea: {
+                  show: true
+              }
+          },
+          dataZoom: [
+              {
+                  type: 'inside',
+                  start: 50,
+                  end: 100
+              },
+              {
+                  show: true,
+                  type: 'slider',
+                  y: '90%',
+                  start: 50,
+                  end: 100
+              }
+          ],
+          series: [
+              {
+                  name: '上证指数',
+                  type: 'candlestick',
+                  data: []
+              }
+          ]
+        };
+
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        
+        // 异步加载数据
+        $.ajax({
+            url: "http://127.0.0.1:8000/v1/transdata/hist_rec/sh/D/2016-02-01/2016-03-01/open,close,low,high",
+            dataType:'jsonp',
+            success: function(data) {
+                // 填入数据
+                myChart.setOption({
+                    xAxis: {
+                        type: 'category',
+                        data: data.index,
+                        scale: true,
+                        boundaryGap : false,
+                        axisLine: {onZero: false},
+                        splitLine: {show: false},
+                        splitNumber: 20,
+                        min: 'dataMin',
+                        max: 'dataMax'
+                    },
+                    series: [
+                        {
+                            name: '上证指数',
+                            type: 'candlestick',
+                            data: data.values
+                        }
+                    ]
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="./lib/jquery-2.2.3.min.js"></script>
+    <script>
+    $(document).ready(function(){
+        $("button").click(function(){
+            $.ajax({
+                url: 'http://127.0.0.1:8000/v1/transdata/hist_rec/sh/D/2016-02-01/2016-03-01/open,close,low,high',
+                dataType : "jsonp",
+                success: function(json) {
+                    for (var i=0; i<json.index.length; i++) { 
+                        $("#test").append(json.index[i] + "</br>");
+                    }
+                }
+            });
+        });
+    });
+    </script>
+</head>
+<body>
+<h1>上证指数</h1>
+<p>过去一个月：</p>
+<p id="test"></p>
+<button>获取数据</button>
+</body>
+</html>
+
