@@ -8,6 +8,20 @@
 </head>
 
 <body>
+    <br>
+    <form id="code" style="float:left"><b>Code:</b> <input type="text" name="code"></form>
+    <form id="start" style="float:left"><b>&nbspStart:</b> <input type="text" name="start"></form>
+    <form id="end" style="float:left"><b>&nbspEnd:</b> <input type="text" name="end"></form>
+    <form id="type style="float:left" action="">
+        <b>&nbspType:</b>
+        <select name="ktype">
+            <option value="D">日线</option>
+            <option value="60" selected>60分钟线</option>
+            <option value="30">30分钟线</option>
+            <option value="15">15分钟线</option>
+            <option value="5">5分钟线</option>
+        </select>
+    </form>
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <div id="main" style="width: 1200px;height:600px;"></div>
     <script type="text/javascript">        
@@ -47,14 +61,14 @@
           dataZoom: [
               {
                   type: 'inside',
-                  start: 50,
+                  start: 75,
                   end: 100
               },
               {
                   show: true,
                   type: 'slider',
                   y: '90%',
-                  start: 50,
+                  start: 75,
                   end: 100
               }
           ],
@@ -76,7 +90,7 @@
         
         // 异步加载数据
         $.ajax({
-            url: "http://127.0.0.1:8000/v1/transdata/hist_rec/sh/D/2016-02-01/2016-03-01/open,close,low,high",
+            url: "http://127.0.0.1:8000/v1/transdata/hist_rec/sh/60/2016-02-01/2016-03-01/open,close,low,high",
             dataType:'jsonp',
             success: function(data) {
                 // 填入数据
