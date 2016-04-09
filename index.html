@@ -9,76 +9,91 @@
 
 <body>
     <br>
-    <form id="code" style="float:left"><b>Code:</b> <input type="text" name="code"></form>
-    <form id="start" style="float:left"><b>&nbspStart:</b> <input type="text" name="start"></form>
-    <form id="end" style="float:left"><b>&nbspEnd:</b> <input type="text" name="end"></form>
-    <form id="type style="float:left" action="">
-        <b>&nbspType:</b>
-        <select name="ktype">
-            <option value="D">日线</option>
-            <option value="60" selected>60分钟线</option>
-            <option value="30">30分钟线</option>
-            <option value="15">15分钟线</option>
-            <option value="5">5分钟线</option>
-        </select>
-    </form>
+    <div>
+        <div style="float:left"> <b>Code:</b> <input type="text" id="code" placeholder="sh"></div>
+        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2016-03-01"></div>
+        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2016-04-01"></div>
+        <div style="float:left">
+            <b>&nbspType:</b>
+            <select id="ktype">
+                <option value="D">日线</option>
+                <option value="60" selected>60分钟线</option>
+                <option value="30">30分钟线</option>
+                <option value="15">15分钟线</option>
+                <option value="5">5分钟线</option>
+            </select>
+        </div>
+        <div style="float:left">&nbsp</div>
+        <div style="float:left"><button id="btn1" style="float:left">Submit</button></div>
+        <div style="clear:both">
+    </div>
+    <br>
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <div id="main" style="width: 1200px;height:600px;"></div>
-    <script type="text/javascript">        
+    <script type="text/javascript">
         option = {
-          title: {
-              text: '上证指数',
-              left: 'center'
-          },
-          tooltip: {
-              trigger: 'axis',
-              axisPointer: {
-                  type: 'line'
-              }
-          },
-          grid: {
-              left: '10%',
-              right: '10%',
-              bottom: '15%'
-          },
-          xAxis: {
-              type: 'category',
-              data: [],
-              scale: true,
-              boundaryGap : false,
-              axisLine: {onZero: false},
-              splitLine: {show: false},
-              splitNumber: 20,
-              min: 'dataMin',
-              max: 'dataMax'
-          },          
-          yAxis: {
-              scale: true,
-              splitArea: {
-                  show: true
-              }
-          },
-          dataZoom: [
-              {
-                  type: 'inside',
-                  start: 75,
-                  end: 100
-              },
-              {
-                  show: true,
-                  type: 'slider',
-                  y: '90%',
-                  start: 75,
-                  end: 100
-              }
-          ],
-          series: [
-              {
-                  name: '上证指数',
-                  type: 'candlestick',
-                  data: []
-              }
-          ]
+            title: {
+                text: '上证指数',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'line'
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    dataZoom: {},
+                    dataView: {readOnly: false},
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '10%',
+                right: '10%',
+                bottom: '15%'
+            },
+            xAxis: {
+                type: 'category',
+                data: [],
+                scale: true,
+                boundaryGap : false,
+                axisLine: {onZero: false},
+                splitLine: {show: false},
+                splitNumber: 20,
+                min: 'dataMin',
+                max: 'dataMax'
+            },          
+            yAxis: {
+                scale: true,
+                splitArea: {
+                show: true
+                }
+            },
+            dataZoom: [
+                {
+                    type: 'inside',
+                    start: 0,
+                    end: 100
+                },
+                {
+                    show: true,
+                    type: 'slider',
+                    y: '90%',
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: [
+                {
+                    name: '上证指数',
+                    type: 'candlestick',
+                    data: []
+                }
+            ]
         };
 
 
@@ -89,33 +104,69 @@
         myChart.setOption(option);
         
         // 异步加载数据
+        var default_code = $("#code").attr("placeholder");
+        var default_start = $("#start").attr("placeholder");
+        var default_end = $("#end").attr("placeholder");
+        var default_ktype = $("#ktype").val();
+        var default_url = "http://127.0.0.1:8000/v1/transdata/hist_rec/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end + "/open,close,low,high";
         $.ajax({
-            url: "http://127.0.0.1:8000/v1/transdata/hist_rec/sh/60/2016-02-01/2016-03-01/open,close,low,high",
+            url: default_url,
             dataType:'jsonp',
             success: function(data) {
-                // 填入数据
-                myChart.setOption({
-                    xAxis: {
-                        type: 'category',
-                        data: data.index,
-                        scale: true,
-                        boundaryGap : false,
-                        axisLine: {onZero: false},
-                        splitLine: {show: false},
-                        splitNumber: 20,
-                        min: 'dataMin',
-                        max: 'dataMax'
-                    },
-                    series: [
-                        {
-                            name: '上证指数',
-                            type: 'candlestick',
-                            data: data.values
-                        }
-                    ]
-                });
+                candlestick_update(data);
             }
         });
+        
+        $(document).ready(function(){
+            $("#btn1").click(function(){
+                var code = update_input_value("#code");
+                var start = update_input_value("#start");
+                var end = update_input_value("#end");
+                var ktype = $("#ktype").val();
+                console.log("code: " + code + ", start: " + start + ", end: " + end + ", ktype: " + ktype);
+                var url = "http://127.0.0.1:8000/v1/transdata/hist_rec/" + code + "/" + ktype + "/" + start + "/" + end + "/open,close,low,high";
+                console.log("url: " + url);
+                $.ajax({
+                    url: url,
+                    dataType:'jsonp',
+                    success: function(data) {
+                        candlestick_update(data);
+                    }
+                });
+            });
+        });
+        
+        function candlestick_update(data) {
+            // 填入数据
+            myChart.setOption({
+                xAxis: {
+                    type: 'category',
+                    data: data.index,
+                    scale: true,
+                    boundaryGap : false,
+                    axisLine: {onZero: false},
+                    splitLine: {show: false},
+                    splitNumber: 20,
+                    min: 'dataMin',
+                    max: 'dataMax'
+                },
+                series: [
+                    {
+                        name: '上证指数',
+                        type: 'candlestick',
+                        data: data.values
+                    }
+                ]
+            });
+        }
+        
+        function update_input_value(id) {
+            if($(id).val() == "") {
+                return $(id).attr("placeholder");
+            } else {
+                return $(id).val();
+            }
+        }
     </script>
 </body>
 
