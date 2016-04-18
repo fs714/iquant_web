@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- 引入 ECharts 文件 -->
+    <script src="./lib/echarts.min.js"></script>
+    <script src="./lib/jquery-2.2.3.min.js"></script>
+</head>
+
+<body>
+    <p><b><h2>策略：深度资金</h2></b></p>
+    <div>
+        <div style="float:left"><b>密度比下限:</b><input type="text" id="low" placeholder="0.9"></div>
+        <div style="float:left"><b>&nbsp最小周期（天）:</b><input type="text" id="duration" placeholder="600"></div>
+        <div style="float:left">&nbsp</div>
+        <div style="float:left"><button id="btn1" style="float:left">过滤</button></div>
+        <div style="clear:both">
+    </div>
+    <br>
+    <div id="main"></div>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#btn1").click(function(){
+                var diff_ratio = update_input_value("#low");
+                var duration = update_input_value("#duration");
+                var url = "http://127.0.0.1:8000/v1/strategies/deep_capital/" + diff_ratio + "/" + duration;
+                $.ajax({
+                    url: url,
+                    dataType:'jsonp',
+                    success: function(data) {
+                        chart_update(data);
+                    }
+                });
+            });
+        });
+    
+        function chart_update(data) {
+            brief = data.brief.sort(function NumAscSort(a,b) {
+                return a.ratio-b.ratio;
+            })
+            for (i=0; i<brief.length; i++) {
+                current_table = 'table' + i;
+                html = '<div id="' + current_table + '" style="width: 900px;height:300px;"></div>';
+                console.log(html);
+                $("#main").append(html);   
+                
+                option = {
+                    title: {
+                        text: brief[i].name + "(" + brief[i].code + "): " + brief[i].ratio.toFixed(2)
+                    },
+                    tooltip : {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data:['股东总户数','平均每户持流通股数']
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            dataZoom: {},
+                            dataView: {readOnly: false},
+                            restore: {},
+                            saveAsImage: {}
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis : [
+                        {
+                            type : 'category',
+                            boundaryGap : false,
+                            data : data[brief[i].code].date_list
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'value'
+                        }
+                    ],
+                    series : [
+                        {
+                            name:'股东总户数',
+                            type:'line',
+                            stack: '总量',
+                            areaStyle: {normal: {}},
+                            data:data[brief[i].code].holder_mun_list
+                        },
+                        {
+                            name:'平均每户持流通股数',
+                            type:'line',
+                            stack: '总量',
+                            areaStyle: {normal: {}},
+                            data:data[brief[i].code].holder_avgnum_tradable_list
+                        }
+                    ]
+                };
+                var myChart = echarts.init(document.getElementById(current_table));
+                myChart.setOption(option);
+            }
+        }
+        
+        function update_input_value(id) {
+            if($(id).val() == "") {
+                return $(id).attr("placeholder");
+            } else {
+                return $(id).val();
+            }
+        }
+    </script>
+</body>
+
+</html>
