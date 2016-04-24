@@ -5,25 +5,33 @@
     <!-- 引入 ECharts 文件 -->
     <script src="./lib/echarts.min.js"></script>
     <script src="./lib/jquery-2.2.3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css"> 
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
 </head>
 
 <body>
     <p><b><h2>策略：深度资金</h2></b></p>
     <div>
-        <div style="float:left"><b>密度比下限:</b><input type="text" id="low" placeholder="0.9"></div>
-        <div style="float:left"><b>&nbsp最小周期（天）:</b><input type="text" id="duration" placeholder="600"></div>
+        <div style="float:left"><b>密度比下限:</b><input type="text" id="low" placeholder="0.5"></div>
+        <div style="float:left"><b>密度比上限:</b><input type="text" id="high" placeholder="0.8"></div>
+        <div style="float:left"><b>&nbsp周期:</b><input type="text" id="duration" placeholder="8"></div>
         <div style="float:left">&nbsp</div>
         <div style="float:left"><button id="btn1" style="float:left">过滤</button></div>
         <div style="clear:both">
     </div>
     <br>
-    <div id="main"></div>
+    <div id="table" style="width: 800px;"></div>
+    <div id="button"></div>
+    <div id="chart"></div>
     <script type="text/javascript">
+        var server = "127.0.0.1:8000"
+    
         $(document).ready(function(){
             $("#btn1").click(function(){
-                var diff_ratio = update_input_value("#low");
+                var threshold_low = update_input_value("#low");
+                var threshold_high = update_input_value("#high");
                 var duration = update_input_value("#duration");
-                var url = "http://127.0.0.1:8000/v1/strategies/deep_capital/" + diff_ratio + "/" + duration;
+                var url = "http://" + server + "/v1/strategies/deep_capital/" + threshold_low + "/" + threshold_high + "/" + duration;
                 $.ajax({
                     url: url,
                     dataType:'jsonp',
@@ -36,13 +44,42 @@
     
         function chart_update(data) {
             brief = data.brief.sort(function NumAscSort(a,b) {
-                return a.ratio-b.ratio;
+                return b.ratio-a.ratio;
             })
+            html =  '<table id="table01" class="display" width="100%">';
+            html += '<thead>'
+            html += '<tr>'
+            html += '<th>Name</th>'
+            html += '<th>Code</th>'
+            html += '<th>Ratio</th>'
+            html += '</tr>'
+            html += '</thead>'
+            html += '</table>'
+            $("#table").append(html);
+            $('#table01').DataTable({
+                paging: true,
+                "order": [[ 2, "desc" ]],
+                data: brief,
+                columns: [
+                    { data: 'name' },
+                    { data: 'code' },
+                    { data: 'ratio' }
+                ]
+            });
+            
+            html = '<button id="btn2">显示图表</button>';
+            $("#button").append(html);
+            $("#btn2").click(function(){
+                show_chart(brief, data);
+            })
+        }
+        
+        function show_chart(brief, data) {
             for (i=0; i<brief.length; i++) {
                 current_table = 'table' + i;
-                html = '<div id="' + current_table + '" style="width: 900px;height:300px;"></div>';
+                html = '<div id="' + current_table + '" style="width: 800px;height:300px;"></div>';
                 console.log(html);
-                $("#main").append(html);   
+                $("#chart").append(html);
                 
                 option = {
                     title: {

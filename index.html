@@ -31,6 +31,8 @@
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <div id="main" style="width: 1200px;height:600px;"></div>
     <script type="text/javascript">
+        var server = "127.0.0.1:8000"
+        
         option = {
             title: {
                 text: '上证指数',
@@ -108,7 +110,7 @@
         var default_start = $("#start").attr("placeholder");
         var default_end = $("#end").attr("placeholder");
         var default_ktype = $("#ktype").val();
-        var default_url = "http://127.0.0.1:8000/v1/transdata/hist_rec/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end + "/open,close,low,high";
+        var default_url = "http://" + server + "/v1/transdata/hist_rec/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end + "/open,close,low,high";
         $.ajax({
             url: default_url,
             dataType:'jsonp',
@@ -124,7 +126,7 @@
                 var end = update_input_value("#end");
                 var ktype = $("#ktype").val();
                 console.log("code: " + code + ", start: " + start + ", end: " + end + ", ktype: " + ktype);
-                var url = "http://127.0.0.1:8000/v1/transdata/hist_rec/" + code + "/" + ktype + "/" + start + "/" + end + "/open,close,low,high";
+                var url = "http://" + server + "/v1/transdata/hist_rec/" + code + "/" + ktype + "/" + start + "/" + end + "/open,close,low,high";
                 console.log("url: " + url);
                 $.ajax({
                     url: url,
