@@ -10,14 +10,14 @@
 <body>
     <br>
     <div>
-        <div style="float:left"> <b>Code:</b> <input type="text" id="code" placeholder="sh"></div>
-        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2016-03-01"></div>
-        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2016-04-01"></div>
+        <div style="float:left"> <b>Code:</b> <input type="text" id="code" placeholder="000001"></div>
+        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2015-01-01"></div>
+        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2016-01-01"></div>
         <div style="float:left">
             <b>&nbspType:</b>
             <select id="ktype">
-                <option value="D">日线</option>
-                <option value="60" selected>60分钟线</option>
+                <option value="D" selected>日线</option>
+                <option value="60">60分钟线</option>
                 <option value="30">30分钟线</option>
                 <option value="15">15分钟线</option>
                 <option value="5">5分钟线</option>
@@ -35,23 +35,10 @@
         
         option = {
             title: {
-                text: '上证指数',
-                left: 'center'
+                text: '上证指数'
             },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'line'
-                }
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    dataZoom: {},
-                    dataView: {readOnly: false},
-                    restore: {},
-                    saveAsImage: {}
-                }
+            legend: {
+                data:['Kline','Chan_Kline']
             },
             grid: {
                 left: '10%',
@@ -60,20 +47,14 @@
             },
             xAxis: {
                 type: 'category',
-                data: [],
-                scale: true,
-                boundaryGap : false,
+                boundaryGap : true,
                 axisLine: {onZero: false},
                 splitLine: {show: false},
-                splitNumber: 20,
-                min: 'dataMin',
-                max: 'dataMax'
-            },          
+                data: []
+            },
             yAxis: {
                 scale: true,
-                splitArea: {
-                show: true
-                }
+                splitArea: {show: true}
             },
             dataZoom: [
                 {
@@ -84,15 +65,48 @@
                 {
                     show: true,
                     type: 'slider',
-                    y: '90%',
                     start: 0,
                     end: 100
                 }
             ],
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {type: 'line'}
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    dataZoom: {yAxisIndex: false},
+                    dataView: {readOnly: false},
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
             series: [
                 {
-                    name: '上证指数',
+                    name: 'Kline',
                     type: 'candlestick',
+                    itemStyle: {
+                        normal: {
+                            color: '#B22222',
+                            color0: '#008000',
+                            opacity: 0.4
+                        }
+                    },
+                    data: []
+                },
+                {
+                    name: 'Chan_Kline',
+                    type: 'candlestick',
+                    itemStyle: {
+                        normal: {
+                            color: 'rgba(0,0,0,0)',
+                            color0: 'rgba(0,0,0,0)',
+                            borderColor: '#B22222',
+                            borderColor0: '#008000',
+                            borderWidth: 2
+                        }
+                    },
                     data: []
                 }
             ]
@@ -110,7 +124,7 @@
         var default_start = $("#start").attr("placeholder");
         var default_end = $("#end").attr("placeholder");
         var default_ktype = $("#ktype").val();
-        var default_url = "http://" + server + "/v1/transdata/hist_rec/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end + "/open,close,low,high";
+        var default_url = "http://" + server + "/v1/transdata/chan_kline_fetcher/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end;
         $.ajax({
             url: default_url,
             dataType:'jsonp',
@@ -126,7 +140,7 @@
                 var end = update_input_value("#end");
                 var ktype = $("#ktype").val();
                 console.log("code: " + code + ", start: " + start + ", end: " + end + ", ktype: " + ktype);
-                var url = "http://" + server + "/v1/transdata/hist_rec/" + code + "/" + ktype + "/" + start + "/" + end + "/open,close,low,high";
+                var url = "http://" + server + "/v1/transdata/chan_kline_fetcher/" + code + "/" + ktype + "/" + start + "/" + end;
                 console.log("url: " + url);
                 $.ajax({
                     url: url,
@@ -142,21 +156,16 @@
             // 填入数据
             myChart.setOption({
                 xAxis: {
-                    type: 'category',
                     data: data.index,
-                    scale: true,
-                    boundaryGap : false,
-                    axisLine: {onZero: false},
-                    splitLine: {show: false},
-                    splitNumber: 20,
-                    min: 'dataMin',
-                    max: 'dataMax'
                 },
                 series: [
                     {
-                        name: '上证指数',
-                        type: 'candlestick',
-                        data: data.values
+                        name: 'Kline',
+                        data: data.kline
+                    },
+                    {
+                        name: 'Chan_Kline',
+                        data: data.chan_kline
                     }
                 ]
             });
