@@ -11,16 +11,17 @@
     <br>
     <div>
         <div style="float:left"> <b>Code:</b> <input type="text" id="code" placeholder="000001"></div>
-        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2015-01-01"></div>
-        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2016-01-01"></div>
+        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2016-04-22"></div>
+        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2016-04-29"></div>
         <div style="float:left">
             <b>&nbspType:</b>
             <select id="ktype">
-                <option value="D" selected>日线</option>
+                <option value="D">日线</option>
                 <option value="60">60分钟线</option>
                 <option value="30">30分钟线</option>
                 <option value="15">15分钟线</option>
                 <option value="5">5分钟线</option>
+                <option value="1" selected>1分钟线</option>
             </select>
         </div>
         <div style="float:left">&nbsp</div>
@@ -38,7 +39,7 @@
                 text: '上证指数'
             },
             legend: {
-                data:['Kline','Chan_Kline']
+                data:['Kline','Chan_Kline', 'Chan_Bi']
             },
             grid: {
                 left: '10%',
@@ -108,6 +109,11 @@
                         }
                     },
                     data: []
+                },
+                {
+                    name: 'Chan_Bi',
+                    type: 'line',
+                    data: []
                 }
             ]
         };
@@ -166,6 +172,10 @@
                     {
                         name: 'Chan_Kline',
                         data: data.chan_kline
+                    },
+                    {
+                        name: 'Chan_Bi',
+                        data: data.chan_bi
                     }
                 ]
             });
