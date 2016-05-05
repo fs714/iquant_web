@@ -33,13 +33,13 @@
     <div id="main" style="width: 1200px;height:600px;"></div>
     <script type="text/javascript">
         var server = "127.0.0.1:8000"
-        
+
         option = {
             title: {
                 text: '上证指数'
             },
             legend: {
-                data:['Kline','Chan_Kline', 'Chan_Bi']
+                data:['Kline','Chan_Kline', 'Chan_Bi', 'Chan_Duan']
             },
             grid: {
                 left: '10%',
@@ -113,6 +113,23 @@
                 {
                     name: 'Chan_Bi',
                     type: 'line',
+                    lineStyle:{
+                        normal:{
+                            color: '#0000FF',
+                            width: 2
+                        }
+                    },
+                    data: []
+                },
+                {
+                    name: 'Chan_Duan',
+                    type: 'line',
+                    lineStyle:{
+                        normal:{
+                            color: '#FF0000',
+                            width: 3
+                        }
+                    },
                     data: []
                 }
             ]
@@ -124,7 +141,7 @@
 
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
-        
+
         // 异步加载数据
         var default_code = $("#code").attr("placeholder");
         var default_start = $("#start").attr("placeholder");
@@ -138,7 +155,7 @@
                 candlestick_update(data);
             }
         });
-        
+
         $(document).ready(function(){
             $("#btn1").click(function(){
                 var code = update_input_value("#code");
@@ -157,7 +174,7 @@
                 });
             });
         });
-        
+
         function candlestick_update(data) {
             // 填入数据
             myChart.setOption({
@@ -176,11 +193,15 @@
                     {
                         name: 'Chan_Bi',
                         data: data.chan_bi
+                    },
+                    {
+                        name: 'Chan_Duan',
+                        data: data.chan_duan
                     }
                 ]
             });
         }
-        
+
         function update_input_value(id) {
             if($(id).val() == "") {
                 return $(id).attr("placeholder");
