@@ -39,7 +39,7 @@
                 text: '上证指数'
             },
             legend: {
-                data:['Kline','Chan_Kline', 'Chan_Bi', 'Chan_Duan']
+                data:['Kline','Chan_Kline', 'Chan_Bi', 'Chan_Duan', 'Trend_1', 'Trend_2']
             },
             grid: {
                 left: '10%',
@@ -131,6 +131,26 @@
                         }
                     },
                     data: []
+                },
+                {
+                    name: 'Trend_1',
+                    type: 'line',
+                    lineStyle:{
+                        normal:{
+                            width: 4
+                        }
+                    },
+                    data: []
+                },
+                {
+                    name: 'Trend_2',
+                    type: 'line',
+                    lineStyle:{
+                        normal:{
+                            width: 5
+                        }
+                    },
+                    data: []
                 }
             ]
         };
@@ -197,6 +217,14 @@
                     {
                         name: 'Chan_Duan',
                         data: data.chan_duan
+                    },
+                    {
+                        name: 'Trend_1',
+                        data: data.chan_trend_1
+                    },
+                    {
+                        name: 'Trend_2',
+                        data: data.chan_trend_2
                     }
                 ]
             });
