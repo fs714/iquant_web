@@ -101,6 +101,38 @@
             ['2013/6/7', 2242.26,2210.9,2205.07,2250.63]
         ]);
 
+        markArea_data1 = [
+          [
+            {
+              name: 'Level 1',
+              xAxis: '2013/2/1',
+              yAxis: 2421.15
+            }, {
+              xAxis: '2013/2/19',
+              yAxis: 2373.53
+            }
+          ],
+          [
+            {
+              name: 'Level 1',
+              xAxis: '2013/2/26',
+              yAxis: 2340.71
+            }, {
+              xAxis: '2013/3/26',
+              yAxis: 2281.12
+            }
+          ],
+          [
+            {
+              name: 'Level 1',
+              xAxis: '2013/4/19',
+              yAxis: 2250.11
+            }, {
+              xAxis: '2013/5/16',
+              yAxis: 2210.77
+            }
+          ]
+        ]
 
         function splitData(rawData) {
             var categoryData = [];
@@ -168,6 +200,16 @@
                     name: '上证指数',
                     type: 'candlestick',
                     data: data0.values,
+                    markArea: {
+                      itemStyle: {
+                          normal: {
+                              color: 'rgba(178,34,34,0.3)',
+                              borderColor: '#B22222',
+                              borderWidth: 2
+                          }
+                      },
+                      data: markArea_data1
+                    },
                     markPoint: {
                         symbol: 'pin',
                         animation: true,
