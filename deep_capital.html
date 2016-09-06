@@ -5,7 +5,8 @@
     <!-- 引入 ECharts 文件 -->
     <script src="./lib/echarts.min.js"></script>
     <script src="./lib/jquery-2.2.3.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css"> 
+    <script src="./lib/server.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
 </head>
 
@@ -24,8 +25,6 @@
     <div id="button"></div>
     <div id="chart"></div>
     <script type="text/javascript">
-        var server = "127.0.0.1:8000"
-    
         $(document).ready(function(){
             $("#btn1").click(function(){
                 var threshold_low = update_input_value("#low");
@@ -41,7 +40,7 @@
                 });
             });
         });
-    
+
         function chart_update(data) {
             brief = data.brief.sort(function NumAscSort(a,b) {
                 return b.ratio-a.ratio;
@@ -66,21 +65,21 @@
                     { data: 'ratio' }
                 ]
             });
-            
+
             html = '<button id="btn2">显示图表</button>';
             $("#button").append(html);
             $("#btn2").click(function(){
                 show_chart(brief, data);
             })
         }
-        
+
         function show_chart(brief, data) {
             for (i=0; i<brief.length; i++) {
                 current_table = 'table' + i;
                 html = '<div id="' + current_table + '" style="width: 800px;height:300px;"></div>';
                 console.log(html);
                 $("#chart").append(html);
-                
+
                 option = {
                     title: {
                         text: brief[i].name + "(" + brief[i].code + "): " + brief[i].ratio.toFixed(2)
@@ -139,7 +138,7 @@
                 myChart.setOption(option);
             }
         }
-        
+
         function update_input_value(id) {
             if($(id).val() == "") {
                 return $(id).attr("placeholder");
