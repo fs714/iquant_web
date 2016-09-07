@@ -12,7 +12,7 @@
     <br>
     <div>
         <div style="float:left"> <b>Code:</b> <input type="text" id="code" placeholder="600000.SH"></div>
-        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2016-04-22"></div>
+        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2016-01-01"></div>
         <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2016-04-29"></div>
         <div style="float:left">
             <b>&nbspType:</b>
@@ -29,13 +29,15 @@
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <div id="main" style="width: 1200px;height:600px;"></div>
     <script type="text/javascript">
+        $(document).ready(function(){
+          $("#start").attr('value', "2016-01-01");
+          $("#end").attr('value', getCurrentDate());
+        });
+
         option = {
-            title: {
-                text: '上证指数'
-            },
             legend: {
                 left: 'center',
-                data:['Chan_Bi', 'Chan_Duan', 'Trend_1', 'Trend_2', 'Trend3']
+                data:['Bi', 'Duan', 'Level_1', 'Level_2', 'Level_3']
             },
             grid: {
                 left: '10%',
@@ -104,8 +106,8 @@
                     markArea: {
                         itemStyle: {
                             normal: {
-                                color: 'rgba(0,255,0,0.3)',
-                                borderColor: 'rgba(0,255,0,1)',
+                                color: 'rgba(0, 255, 0, 0.3)',
+                                borderColor: 'rgba(0, 255, 0, 1)',
                                 borderWidth: 2
                             }
                         },
@@ -118,16 +120,16 @@
                     type: 'line',
                     lineStyle:{
                         normal:{
-                            color: 'rgba(255,0,0,1)',
-                            width: 3
+                            color: 'rgba(255, 0, 0, 1)',
+                            width: 4
                         }
                     },
                     markArea: {
                         itemStyle: {
                             normal: {
-                                color: 'rgba(0,255,0,0.3)',
-                                borderColor: 'rgba(0,255,0,1)',
-                                borderWidth: 2
+                                color: 'rgba(0, 0, 255, 0.3)',
+                                borderColor: 'rgba(0, 0, 255, 1)',
+                                borderWidth: 3
                             }
                         },
                         data: []
@@ -139,16 +141,16 @@
                     type: 'line',
                     lineStyle:{
                         normal:{
-                            color: 'rgba(255,128,0,1)',
-                            width: 4
+                            color: 'rgba(255, 128, 0, 1)',
+                            width: 5
                         }
                     },
                     markArea: {
                         itemStyle: {
                             normal: {
-                                color: 'rgba(255,0,0,0.3)',
-                                borderColor: 'rgba(255,0,0,1)',
-                                borderWidth: 3
+                                color: 'rgba(255, 0, 0, 0.3)',
+                                borderColor: 'rgba(255, 0, 0, 1)',
+                                borderWidth: 4
                             }
                         },
                         data: []
@@ -160,15 +162,16 @@
                     type: 'line',
                     lineStyle:{
                         normal:{
-                            width: 5
+                            color: 'rgba(128, 128, 128, 1)',
+                            width: 6
                         }
                     },
                     markArea: {
                         itemStyle: {
                             normal: {
-                                color: 'rgba(255,128,0,0.3)',
-                                borderColor: 'rgba(255,128,0,1)',
-                                borderWidth: 4
+                                color: 'rgba(255, 128, 0, 0.3)',
+                                borderColor: 'rgba(255, 128, 0, 1)',
+                                borderWidth: 5
                             }
                         },
                         data: []
@@ -195,7 +198,7 @@
             url: default_url,
             dataType:'jsonp',
             success: function(data) {
-                candlestick_update(data);
+                candlestick_update(default_code, data);
             }
         });
 
@@ -212,15 +215,18 @@
                     url: url,
                     dataType:'jsonp',
                     success: function(data) {
-                        candlestick_update(data);
+                        candlestick_update(code, data);
                     }
                 });
             });
         });
 
-        function candlestick_update(data) {
+        function candlestick_update(code, data) {
             // 填入数据
             myChart.setOption({
+                title: {
+                    text: code
+                },
                 xAxis: {
                     data: data.index,
                 },
@@ -267,6 +273,22 @@
             } else {
                 return $(id).val();
             }
+        }
+
+        function getCurrentDate() {
+            var date = new Date();
+            var seperator1 = "-";
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var strDate = date.getDate();
+            if (month >= 1 && month <= 9) {
+                month = "0" + month;
+            }
+            if (strDate >= 0 && strDate <= 9) {
+                strDate = "0" + strDate;
+            }
+            var currentdate = year + seperator1 + month + seperator1 + strDate;
+            return currentdate;
         }
     </script>
 </body>
