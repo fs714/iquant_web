@@ -6,14 +6,14 @@
     <script src="./lib/echarts.min.js"></script>
     <script src="./lib/jquery-2.2.3.min.js"></script>
     <script src="./lib/server.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./lib/jquery.dataTables.min.css">
+    <script type="text/javascript" charset="utf8" src="./lib/jquery.dataTables.min.js"></script>
 </head>
 
 <body>
     <p><b><h2>策略：深度资金</h2></b></p>
     <div>
-        <div style="float:left"><b>密度比下限:</b><input type="text" id="low" placeholder="0.5"></div>
+        <div style="float:left"><b>密度比下限:</b><input type="text" id="low" placeholder="0.3"></div>
         <div style="float:left"><b>密度比上限:</b><input type="text" id="high" placeholder="0.8"></div>
         <div style="float:left"><b>&nbsp周期:</b><input type="text" id="duration" placeholder="8"></div>
         <div style="float:left">&nbsp</div>
@@ -22,9 +22,16 @@
     </div>
     <br>
     <div id="table" style="width: 800px;"></div>
-    <div id="button"></div>
+    <div>
+      <div style="float:left"><b>Code:</b><input type="text" id="code" placeholder="600000.SH"></div>
+      <div style="float:left">&nbsp</div>
+      <div style="float:left"><button id="btn2" style="float:left">详细图表</button></div>
+    <div>
+
     <div id="chart"></div>
     <script type="text/javascript">
+        var brief_globle;
+        var data_globle;
         $(document).ready(function(){
             $("#btn1").click(function(){
                 var threshold_low = update_input_value("#low");
@@ -39,6 +46,13 @@
                     }
                 });
             });
+        });
+
+        $(document).ready(function(){
+            var code = update_input_value("#code");
+            $("#btn2").click(function(){
+                show_chart(code, data_globle);
+            })
         });
 
         function chart_update(data) {
@@ -65,78 +79,72 @@
                     { data: 'ratio' }
                 ]
             });
-
-            html = '<button id="btn2">显示图表</button>';
-            $("#button").append(html);
-            $("#btn2").click(function(){
-                show_chart(brief, data);
-            })
+            data_globle = data;
+            brief_globle = brief;
         }
 
-        function show_chart(brief, data) {
-            for (i=0; i<brief.length; i++) {
-                current_table = 'table' + i;
-                html = '<div id="' + current_table + '" style="width: 800px;height:300px;"></div>';
-                console.log(html);
-                $("#chart").append(html);
+        function show_chart(code, data) {
+            current_table = code;
+            html = '<div id="' + current_table + '" style="width: 800px;height:300px;"></div>';
+            console.log(html);
+            $("#chart").append(html);
 
-                option = {
-                    title: {
-                        text: brief[i].name + "(" + brief[i].code + "): " + brief[i].ratio.toFixed(2)
+            option = {
+                title: {
+                    text: code
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data:['股东总户数','平均每户持流通股数']
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        dataZoom: {},
+                        dataView: {readOnly: false},
+                        restore: {},
+                        saveAsImage: {}
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        boundaryGap : false,
+                        data : data[code].date_list
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'股东总户数',
+                        type:'line',
+                        stack: '总量',
+                        areaStyle: {normal: {}},
+                        data:data[code].holder_mun_list
                     },
-                    tooltip : {
-                        trigger: 'axis'
-                    },
-                    legend: {
-                        data:['股东总户数','平均每户持流通股数']
-                    },
-                    toolbox: {
-                        show: true,
-                        feature: {
-                            dataZoom: {},
-                            dataView: {readOnly: false},
-                            restore: {},
-                            saveAsImage: {}
-                        }
-                    },
-                    grid: {
-                        left: '3%',
-                        right: '4%',
-                        bottom: '3%',
-                        containLabel: true
-                    },
-                    xAxis : [
-                        {
-                            type : 'category',
-                            boundaryGap : false,
-                            data : data[brief[i].code].date_list
-                        }
-                    ],
-                    yAxis : [
-                        {
-                            type : 'value'
-                        }
-                    ],
-                    series : [
-                        {
-                            name:'股东总户数',
-                            type:'line',
-                            stack: '总量',
-                            areaStyle: {normal: {}},
-                            data:data[brief[i].code].holder_mun_list
-                        },
-                        {
-                            name:'平均每户持流通股数',
-                            type:'line',
-                            stack: '总量',
-                            areaStyle: {normal: {}},
-                            data:data[brief[i].code].holder_avgnum_tradable_list
-                        }
-                    ]
-                };
-                var myChart = echarts.init(document.getElementById(current_table));
-                myChart.setOption(option);
-            }
+                    {
+                        name:'平均每户持流通股数',
+                        type:'line',
+                        stack: '总量',
+                        areaStyle: {normal: {}},
+                        data:data[code].holder_avgnum_tradable_list
+                    }
+                ]
+            };
+            var myChart = echarts.init(document.getElementById(current_table));
+            myChart.setOption(option);
         }
 
         function update_input_value(id) {
