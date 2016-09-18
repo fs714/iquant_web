@@ -22,15 +22,18 @@
     </div>
     <br>
     <div id="table" style="width: 800px;"></div>
+    <br>
     <div>
       <div style="float:left"><b>Code:</b><input type="text" id="code" placeholder="600000.SH"></div>
       <div style="float:left">&nbsp</div>
       <div style="float:left"><button id="btn2" style="float:left">详细图表</button></div>
+      <div style="clear:both">
     <div>
+    <br>
+    <div id="chart" style="width: 800px;height:300px;"></div>
 
     <div id="chart"></div>
     <script type="text/javascript">
-        var brief_globle;
         var data_globle;
         $(document).ready(function(){
             $("#btn1").click(function(){
@@ -49,8 +52,8 @@
         });
 
         $(document).ready(function(){
-            var code = update_input_value("#code");
             $("#btn2").click(function(){
+                var code = update_input_value("#code");
                 show_chart(code, data_globle);
             })
         });
@@ -84,11 +87,6 @@
         }
 
         function show_chart(code, data) {
-            current_table = code;
-            html = '<div id="' + current_table + '" style="width: 800px;height:300px;"></div>';
-            console.log(html);
-            $("#chart").append(html);
-
             option = {
                 title: {
                     text: code
@@ -143,7 +141,7 @@
                     }
                 ]
             };
-            var myChart = echarts.init(document.getElementById(current_table));
+            var myChart = echarts.init(document.getElementById("chart"));
             myChart.setOption(option);
         }
 
