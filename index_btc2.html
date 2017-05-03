@@ -5,24 +5,30 @@
     <!-- 引入 ECharts 文件 -->
     <script src="./lib/echarts.min.js"></script>
     <script src="./lib/jquery-2.2.3.min.js"></script>
-    <script src="./lib/server.js"></script>
+    <script src="./lib/server_btc.js"></script>
 </head>
 
 <body>
     <br>
     <div>
-        <div style="float:left"> <b>Code:</b> <input type="text" id="code" placeholder="600000.SH"></div>
-        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2016-01-01"></div>
-        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2017-12-30"></div>
+        <div style="float:left"> <b>Code:</b> <input type="text" id="code" placeholder="OKCOIN.SH"></div>
+        <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2017-01-01"></div>
+        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2017-12-31"></div>
         <div style="float:left">
             <b>&nbspType:</b>
             <select id="ktype">
-                <option value="3_1">周线</option>
-                <option value="2_1">日线</option>
-                <option value="1_60">60分钟线</option>
+                <option value="3_1">1周线</option>
+                <option value="2_3">3日线</option>
+                <option value="2_1">1日线</option>
+                <option value="1_720">12小时线</option>
+                <option value="1_360">6小时线</option>
+                <option value="1_240">4小时线</option>
+                <option value="1_120">2小时线</option>
+                <option value="1_60">1小时线</option>
                 <option value="1_30">30分钟线</option>
                 <option value="1_15">15分钟线</option>
                 <option value="1_5">5分钟线</option>
+                <option value="1_3">3分钟线</option>
                 <option value="1_1" selected>1分钟线</option>
             </select>
         </div>
@@ -186,18 +192,23 @@
         myChart.setOption(option);
 
         // 异步加载数据
-        var default_code = $("#code").attr("placeholder");
-        var default_start = $("#start").attr("placeholder");
-        var default_end = $("#end").attr("placeholder");
-        var default_ktype = $("#ktype").val();
-        var default_url = "http://" + server + "/v1/transdata/chan_kline_fetcher/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end;
-        $.ajax({
-            url: default_url,
-            dataType:'jsonp',
-            success: function(data) {
-                candlestick_update(data);
-            }
-        });
+        
+        setInterval(function(){
+            var default_code = $("#code").attr("placeholder");
+            var default_start = $("#start").attr("placeholder");
+            var default_end = $("#end").attr("placeholder");
+            var default_ktype = $("#ktype").val();
+            var default_url = "http://" + server + "/v1/transdata/chan_kline_fetcher/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end;
+
+            $.ajax({
+                url: default_url,
+                dataType:'jsonp',
+                success: function(data) {
+                    candlestick_update(data);
+                }
+            });
+        }, 60000);
+
 
         $(document).ready(function(){
             $("#btn1").click(function(){
