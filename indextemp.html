@@ -5,7 +5,6 @@
     <!-- 引入 ECharts 文件 -->
     <script src="./lib/echarts.min.js"></script>
     <script src="./lib/jquery-2.2.3.min.js"></script>
-    <script src="./lib/server.js"></script>
 </head>
 
 <body>
@@ -13,11 +12,16 @@
     <div>
         <div style="float:left"> <b>Code:</b> <input type="text" id="code" placeholder="600000.SH"></div>
         <div style="float:left"> <b>&nbspStart:</b> <input type="text" id="start" placeholder="2016-01-01"></div>
-        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2016-04-29"></div>
+        <div style="float:left"> <b>&nbspEnd:</b> <input type="text" id="end" placeholder="2017-12-30"></div>
         <div style="float:left">
             <b>&nbspType:</b>
             <select id="ktype">
+                <option value="3_1">周线</option>
                 <option value="2_1" selected>日线</option>
+                <option value="1_60">60分钟线</option>
+                <option value="1_30">30分钟线</option>
+                <option value="1_15">15分钟线</option>
+                <option value="1_5">5分钟线</option>
                 <option value="1_1">1分钟线</option>
             </select>
         </div>
@@ -29,15 +33,13 @@
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <div id="main" style="width: 1200px;height:600px;"></div>
     <script type="text/javascript">
-        $(document).ready(function(){
-          $("#start").attr('value', "2016-01-01");
-          $("#end").attr('value', getCurrentDate());
-        });
-
         option = {
+            title: {
+                text: '上证指数'
+            },
             legend: {
                 left: 'center',
-                data:['Bi', 'Duan', 'Level_1', 'Level_2', 'Level_3']
+                data:['Kline','Chan_Kline', 'Chan_Bi', 'Chan_Duan', 'Trend_1', 'Trend_2']
             },
             grid: {
                 left: '10%',
@@ -84,30 +86,45 @@
             },
             series: [
                 {
-                    name: 'Bi',
-                    type: 'line',
-                    lineStyle:{
-                        normal:{
-                            color: 'rgba(0, 255, 0, 1)',
-                            width: 2
+                    name: 'Kline',
+                    type: 'candlestick',
+                    itemStyle: {
+                        normal: {
+                            color: '#B22222',
+                            color0: '#008000',
+                            opacity: 0.4
                         }
                     },
                     data: []
                 },
                 {
-                    name: 'Duan',
+                    name: 'Chan_Kline',
+                    type: 'candlestick',
+                    itemStyle: {
+                        normal: {
+                            color: 'rgba(0,0,0,0)',
+                            color0: 'rgba(0,0,0,0)',
+                            borderColor: '#B22222',
+                            borderColor0: '#008000',
+                            borderWidth: 2
+                        }
+                    },
+                    data: []
+                },
+                {
+                    name: 'Chan_Bi',
                     type: 'line',
                     lineStyle:{
                         normal:{
                             color: 'rgba(0, 0, 255, 1)',
-                            width: 3
+                            width: 2
                         }
                     },
                     markArea: {
                         itemStyle: {
                             normal: {
-                                color: 'rgba(0, 255, 0, 0.3)',
-                                borderColor: 'rgba(0, 255, 0, 1)',
+                                color: 'rgba(0,0,255,0.3)',
+                                borderColor: 'rgba(0,0,255,1)',
                                 borderWidth: 2
                             }
                         },
@@ -116,19 +133,19 @@
                     data: []
                 },
                 {
-                    name: 'Level_1',
+                    name: 'Chan_Duan',
                     type: 'line',
                     lineStyle:{
                         normal:{
-                            color: 'rgba(255, 0, 0, 1)',
-                            width: 4
+                            color: 'rgba(255,0,0,1)',
+                            width: 3
                         }
                     },
                     markArea: {
                         itemStyle: {
                             normal: {
-                                color: 'rgba(0, 0, 255, 0.3)',
-                                borderColor: 'rgba(0, 0, 255, 1)',
+                                color: 'rgba(255,0,0,0.3)',
+                                borderColor: 'rgba(255,0,0,1)',
                                 borderWidth: 3
                             }
                         },
@@ -137,44 +154,23 @@
                     data: []
                 },
                 {
-                    name: 'Level_2',
+                    name: 'Trend_1',
                     type: 'line',
                     lineStyle:{
                         normal:{
-                            color: 'rgba(255, 128, 0, 1)',
-                            width: 5
+                            color: 'rgba(255,128,0,1)',
+                            width: 4
                         }
-                    },
-                    markArea: {
-                        itemStyle: {
-                            normal: {
-                                color: 'rgba(255, 0, 0, 0.3)',
-                                borderColor: 'rgba(255, 0, 0, 1)',
-                                borderWidth: 4
-                            }
-                        },
-                        data: []
                     },
                     data: []
                 },
                 {
-                    name: 'Level_3',
+                    name: 'Trend_2',
                     type: 'line',
                     lineStyle:{
                         normal:{
-                            color: 'rgba(128, 128, 128, 1)',
-                            width: 6
+                            width: 5
                         }
-                    },
-                    markArea: {
-                        itemStyle: {
-                            normal: {
-                                color: 'rgba(255, 128, 0, 0.3)',
-                                borderColor: 'rgba(255, 128, 0, 1)',
-                                borderWidth: 5
-                            }
-                        },
-                        data: []
                     },
                     data: []
                 }
@@ -189,16 +185,17 @@
         myChart.setOption(option);
 
         // 异步加载数据
+	var server = "127.0.0.1:8001"
         var default_code = $("#code").attr("placeholder");
         var default_start = $("#start").attr("placeholder");
         var default_end = $("#end").attr("placeholder");
         var default_ktype = $("#ktype").val();
-        var default_url = "http://" + server + "/v1/transdata/chan_trend_fetcher/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end;
+        var default_url = "http://" + server + "/v1/transdata/chan_kline_fetcher/" + default_code + "/" + default_ktype + "/" + default_start + "/" + default_end;
         $.ajax({
             url: default_url,
             dataType:'jsonp',
             success: function(data) {
-                candlestick_update(default_code, data);
+                candlestick_update(data);
             }
         });
 
@@ -209,59 +206,54 @@
                 var end = update_input_value("#end");
                 var ktype = $("#ktype").val();
                 console.log("code: " + code + ", start: " + start + ", end: " + end + ", ktype: " + ktype);
-                var url = "http://" + server + "/v1/transdata/chan_trend_fetcher/" + code + "/" + ktype + "/" + start + "/" + end;
+                var url = "http://" + server + "/v1/transdata/chan_kline_fetcher/" + code + "/" + ktype + "/" + start + "/" + end;
                 console.log("url: " + url);
                 $.ajax({
                     url: url,
                     dataType:'jsonp',
                     success: function(data) {
-                        candlestick_update(code, data);
+                        candlestick_update(data);
                     }
                 });
             });
         });
 
-        function candlestick_update(code, data) {
+        function candlestick_update(data) {
             // 填入数据
             myChart.setOption({
-                title: {
-                    text: code
-                },
                 xAxis: {
                     data: data.index,
                 },
                 series: [
                     {
-                        name: 'Bi',
-                        data: data.trend['-1']
+                        name: 'Kline',
+                        data: data.kline
                     },
                     {
-                        name: 'Duan',
-                        markArea: {
-                            data: data.centre['-1']
-                        },
-                        data: data.trend['0']
+                        name: 'Chan_Kline',
+                        data: data.chan_kline
                     },
                     {
-                        name: 'Level_1',
+                        name: 'Chan_Bi',
                         markArea: {
-                            data: data.centre['0']
+                            data: data.chan_centre_bi
                         },
-                        data: data.trend['1']
+                        data: data.chan_bi
                     },
                     {
-                        name: 'Level_2',
+                        name: 'Chan_Duan',
                         markArea: {
-                            data: data.centre['1']
+                            data: data.chan_centre_duan
                         },
-                        data: data.trend['2']
+                        data: data.chan_duan
                     },
                     {
-                        name: 'Level_3',
-                        markArea: {
-                            data: data.centre['2']
-                        },
-                        data: data.trend['3']
+                        name: 'Trend_1',
+                        data: data.chan_trend_1
+                    },
+                    {
+                        name: 'Trend_2',
+                        data: data.chan_trend_2
                     }
                 ]
             });
@@ -273,22 +265,6 @@
             } else {
                 return $(id).val();
             }
-        }
-
-        function getCurrentDate() {
-            var date = new Date();
-            var seperator1 = "-";
-            var year = date.getFullYear();
-            var month = date.getMonth() + 1;
-            var strDate = date.getDate();
-            if (month >= 1 && month <= 9) {
-                month = "0" + month;
-            }
-            if (strDate >= 0 && strDate <= 9) {
-                strDate = "0" + strDate;
-            }
-            var currentdate = year + seperator1 + month + seperator1 + strDate;
-            return currentdate;
         }
     </script>
 </body>
